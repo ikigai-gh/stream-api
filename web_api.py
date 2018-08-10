@@ -4,18 +4,27 @@ import stream_api
 
 app = Flask(__name__)
 
-# TODO: Add correct HTTP responses with the result of redis operation
-# TODO: Add json serialization/deserialization
+# TODO: Add extended information about errors in responses
 
 @app.route('/api/add_stream', methods=['PUT'])
-def add_stream(stream):
-	command_result = stream_api.add_stream(stream)
-	return command_result
+def add_stream():
+	stream = construct_stream_from_json(request.json)
+	command_result = decode_redis_response(stream_api.add_stream(stream))
+	if command_result != None:
+		response = Response(json.dumps(STREAM_ADD_SUCCESS), status = 200)
+	else:
+		response = Response(json.dumps(STREAM_ADD_STREAM_ALREADY_EXISTS_ERROR), status = 400)
+	return response
 
 @app.route('/api/get_stream', methods=['GET'])
-def get_stream(stream_id):
-	command_result = stream_api.get_stream(stream)
-	return command_result
+def get_stream():
+	stream_id = request.args.get('stream_id')
+	stream = decode_redis_response(stream_api.get_stream(stream_id))
+	if stream != None:
+		response = Response(stream, status = 200)
+	else:
+		response = Response(json.dumps(STREAM_GET_STREAM_DOES_NOT_EXIST_ERROR), status = 404)
+	return response
 
 @app.route('/api/get_all_streams', methods=['GET'])
 def get_all_streams():
