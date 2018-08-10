@@ -1,6 +1,7 @@
 import json
-from flask import Flask, request
+from flask import Flask, request, Response
 import stream_api
+from stream_helper import *
 
 app = Flask(__name__)
 
@@ -28,20 +29,26 @@ def get_stream():
 
 @app.route('/api/get_all_streams', methods=['GET'])
 def get_all_streams():
-	command_result = stream_api.get_all_streams(stream)
-	return command_result
+	command_result = decode_redis_response(stream_api.get_all_streams())
+	response = Response(json.dumps(command_result))
+	return response
 
 @app.route('/api/delete_stream', methods=['DELETE'])
-def delete_stream(stream_id):
-	command_result = stream_api.delete_stream(stream)
-	return command_result
+def delete_stream():
+	stream_id = request.json.stream_id
+	command_result = decode_redis_response(stream_api.delete_stream(stream_id))
+	response = Response(json.dumps(command_result))
+	return response
 
 @app.route('/api/update_stream', methods=['POST'])
-def update_stream(stream):
-	command_result = stream_api.update_stream(stream)
-	return command_result
+def update_stream():
+	stream = construct_stream_from_json(request.json)
+	command_result = decode_redis_response(stream_api.update_stream(stream))
+	response = Response(json.dumps(command_result))
+	return response
 
 @app.route('/api/dump_streams', methods=['GET'])
 def dump_streams():
-	command_result = stream_api.dump_streams(stream)
-	return command_result 
+	command_result = decode_redis_response(stream_api.dump_streams())
+	response = Response(json.dumps(command_result))
+	return response 
