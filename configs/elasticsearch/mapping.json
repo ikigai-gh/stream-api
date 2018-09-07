@@ -1,0 +1,15 @@
+{
+	"mappings" : 
+	{
+        "stream" : 
+        {
+            "properties" : 
+            {
+                "uuid" : { "type" : "keyword" },
+                "date" : { "type" : "date" },
+                "title" : { "type" : "keyword" },
+                "game" : { "type" : "keyword" }
+            }
+        }
+    }
+}

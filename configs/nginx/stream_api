@@ -1,0 +1,35 @@
+server {
+    listen 80;
+    server_name 0.0.0.0;
+
+    error_page 404 /404.html;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/sadmonad/Programming/python/test_project;
+    }
+
+    location / {
+        include         uwsgi_params;
+        uwsgi_pass      unix:/var/www/stream_api.sock;
+        limit_except GET POST {
+            deny all;
+        }
+    }
+
+    location /api {
+        deny all;
+    }
+
+    location /nginx_status {
+        # Turn on stats
+        stub_status on;
+        access_log   off;
+        deny all;
+   }
+
+   location /foo {
+        alias /home/ubuntu/1.mp4;
+        limit_rate 15k;
+   }
+}
